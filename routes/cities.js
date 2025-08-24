@@ -6,9 +6,10 @@ const City = require("../models/City");
 // Save a favorite city
 router.post("/", async (req, res) => {
   try {
+    // Receive the data from request
     const { name, country } = req.body;
-    const city = new City({ name, country });
-    await city.save();
+    const city = new City({ name, country }); //Create the document using model
+    await city.save(); // Save the document in DB
     res.json(city);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -28,7 +29,7 @@ router.get("/", async (req, res) => {
 // City autocomplete (geocoding)
 router.get("/search", async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q } = req.query; // get from query parameter
     if (!q) return res.status(400).json({ error: "Missing query param: q" });
 
     const url = `https://api.openweathermap.org/geo/1.0/direct?q=${q}&limit=5&appid=${process.env.OPENWEATHER_API_KEY}`;
@@ -41,7 +42,7 @@ router.get("/search", async (req, res) => {
   }
 });
 
-// routes/cities.js
+// Remove the city
 router.delete("/:id", async (req, res) => {
   try {
     const city = await City.findByIdAndDelete(req.params.id);
@@ -59,8 +60,10 @@ router.get("/weather", async (req, res) => {
     let url;
 
     if (lat && lon) {
+      //get weather using lat and lon; e.g if you are using current location
       url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${process.env.OPENWEATHER_API_KEY}`;
     } else if (q) {
+      //else query parameter
       url = `https://api.openweathermap.org/data/2.5/weather?q=${q}&units=${unit}&appid=${process.env.OPENWEATHER_API_KEY}`;
     } else {
       return res.status(400).json({ error: "Missing query params" });
